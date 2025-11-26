@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.kmp_template.shared_client.feature.presentation.HomeScreen
-import com.example.kmp_template.shared_client.feature.presentation.HomeState
+import com.example.kmp_template.shared_client.home.presentation.HomeScreen
+import com.example.kmp_template.shared_client.home.presentation.HomeState
 import com.example.kmp_template.shared_client.theme.AppTheme
 
 @Composable
@@ -43,7 +43,6 @@ private fun Home_Preview() {
         HomeScreen(
             state,
             onAction = {},
-            onNav = {}
         )
     }
 }

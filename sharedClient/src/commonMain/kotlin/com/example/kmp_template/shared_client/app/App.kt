@@ -8,11 +8,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.example.kmp_template.shared_client.feature.presentation.HomeScreenRoot
+import com.example.kmp_template.shared_client.core.navigation.NavigationHost
+import com.example.kmp_template.shared_client.core.presentation.toast.ToastHost
+import com.example.kmp_template.shared_client.home.presentation.HomeScreenRoot
+import com.example.kmp_template.shared_client.settings.presentation.composable.SettingsScreenRoot
 import com.example.kmp_template.shared_client.theme.AppTheme
 
 
@@ -29,21 +31,22 @@ fun App() {
             ) {
                 val navController = rememberNavController()
 
-                NavHost(
+                NavigationHost(
                     navController = navController,
                     startDestination = Route.Graph,
                 ) {
-                    navigation<Route.Graph>(
-                        startDestination = Route.Home,
-                    ) {
+                    navigation<Route.Graph>(startDestination = Route.Home) {
                         composable<Route.Home> {
-                            HomeScreenRoot(
-                                onBack = navController::navigateUp,
-                                onNav = navController::navigate,
-                            )
+                            HomeScreenRoot()
+                        }
+
+                        composable<Route.Settings> {
+                            SettingsScreenRoot()
                         }
                     }
                 }
+
+                ToastHost()
             }
         }
     }
