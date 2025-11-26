@@ -88,19 +88,11 @@ fi
 echo
 echo -e "${BLUE}[1/4] Replacing text in files...${NC}"
 
-# Find all files (excluding .git, build, .gradle, .idea, and binary files)
-FILES=$(find . -type f \
-    -not -path "*/.git/*" \
-    -not -path "*/build/*" \
-    -not -path "*/gradle/*" \
-    -not -path "*/.gradle/*" \
-    -not -path "*/.idea/*" \
-    -not -path "*/rename-project.sh")
-
 COUNT=0
-for file in $FILES; do
-    # Check if file is a text file
-    if file "$file" | grep -q text; then
+# Use null-delimited find output to handle filenames with spaces
+while IFS= read -r -d '' file; do
+    # Check if file is a text file or has common text extensions
+    if file "$file" | grep -q text || [[ "$file" =~ \.(xml|json|kt|kts|java|gradle|properties|conf|yaml|yml|md|txt|sh)$ ]]; then
         # Replace all variants - order matters! Replace longer strings first
         sed -i.bak \
             -e "s/$OLD_PACKAGE_DOMAIN\.$OLD_SNAKE/$PACKAGE_DOMAIN.$NEW_SNAKE/g" \
@@ -115,7 +107,14 @@ for file in $FILES; do
         rm -f "${file}.bak"
         COUNT=$((COUNT + 1))
     fi
-done
+done < <(find . -type f \
+    -not -path "*/.git/*" \
+    -not -path "*/build/*" \
+    -not -path "*/gradle/*" \
+    -not -path "*/.gradle/*" \
+    -not -path "*/.idea/*" \
+    -not -path "*/rename-project.sh" \
+    -print0)
 
 echo -e "${GREEN}✓ Processed $COUNT files${NC}"
 
@@ -171,8 +170,8 @@ echo -e "  ${GREEN}✓${NC} Cleaned up empty directories"
 echo
 echo -e "${BLUE}[3/4] Renaming files...${NC}"
 
-# Find and rename files
-while IFS= read -r file; do
+# Find and rename files (using null-delimited output to handle spaces)
+while IFS= read -r -d '' file; do
     if [ -f "$file" ]; then
         dir=$(dirname "$file")
         filename=$(basename "$file")
@@ -183,7 +182,7 @@ while IFS= read -r file; do
             echo -e "  ${GREEN}✓${NC} $filename → $new_filename"
         fi
     fi
-done < <(find . -type f \( -name "*$OLD_PASCAL*" -o -name "*$OLD_SNAKE*" -o -name "*$OLD_KEBAB*" \) -not -path "*/build/*" -not -path "*/.gradle/*" -not -path "*/.git/*" -not -name "rename-project.sh" | sort -r)
+done < <(find . -type f \( -name "*$OLD_PASCAL*" -o -name "*$OLD_SNAKE*" -o -name "*$OLD_KEBAB*" \) -not -path "*/build/*" -not -path "*/.gradle/*" -not -path "*/.git/*" -not -name "rename-project.sh" -print0 | sort -z -r)
 
 echo
 echo -e "${BLUE}[4/4] Cleaning up build artifacts...${NC}"
