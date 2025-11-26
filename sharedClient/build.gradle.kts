@@ -51,6 +51,9 @@ kotlin {
             implementation(libs.material.icons.extended)
             implementation(libs.navigation.compose)
 
+            implementation(libs.androidx.window.core)
+            implementation(libs.material3.adaptive)
+
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinx.datetime)
@@ -84,10 +87,6 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
 
-        dependencies {
-            ksp(libs.room.compiler)
-        }
-
         all {
             languageSettings {
                 optIn("kotlin.uuid.ExperimentalUuidApi")
@@ -109,5 +108,10 @@ android {
 }
 
 dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspJvm", libs.room.compiler)
     debugImplementation(compose.uiTooling)
 }

@@ -3,28 +3,30 @@ agp = "8.13.1"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activityCompose = "1.10.1"
+androidx-activityCompose = "1.12.0"
 androidx-appcompat = "1.7.1"
-androidx-core-ktx = "1.16.0"
-androidx-lifecycle = "2.9.1"
-composeHotReload = "1.0.0-beta04"
-compose-multiplatform = "1.8.2"
-kotlin = "2.2.0"
+androidx-core-ktx = "1.17.0"
+androidx-lifecycle = "2.9.6"
+composeHotReload = "1.0.0"
+compose-multiplatform = "1.9.3"
+kotlin = "2.2.21"
 kotlinx-coroutines = "1.10.2"
 kotlin-serialization = "1.9.0"
-kotlinxIoCore = "0.8.0"
+kotlinxIoCore = "0.8.2"
 materialIconsExtended = "1.7.3"
-navigationCompose = "2.9.0-beta03"
-ktor = "3.2.3"
-koin = "4.1.0"
-coil = "3.2.0"
+androidx-window = "1.5.1"
+material3-adaptive = "1.2.0"
+navigationCompose = "2.9.1"
+ktor = "3.3.3"
+koin = "4.1.1"
+coil = "3.3.0"
 dateTime = "0.7.1"
-room = "2.7.2"
+room = "2.8.4"
 slf4jNop = "2.0.17"
-sqlite = "2.5.2"
-ksp = "2.2.0-2.0.2"
-typesafeConfig = "1.4.4"
-kotlinx-rpc = "0.9.1"
+sqlite = "2.6.2"
+ksp = "2.2.21-2.0.4"
+typesafeConfig = "1.4.5"
+kotlinx-rpc = "0.10.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -78,6 +80,8 @@ coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.r
 coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-window-core = { module = "androidx.window:window-core", version.ref = "androidx-window" }
+material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "material3-adaptive" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }

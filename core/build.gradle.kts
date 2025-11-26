@@ -52,16 +52,20 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
 
-        dependencies {
-            ksp(libs.room.compiler)
-        }
-
         all {
             languageSettings {
                 optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
     }
+}
+
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspJvm", libs.room.compiler)
 }
 
 android {
