@@ -33,6 +33,7 @@ The script automatically handles all case conversions (PascalCase, camelCase, sn
 - **Modern UI**: Material 3 theming with dynamic colors
 - **Comprehensive Logging**: Platform-aware logging system
 - **HTTP Client**: Pre-configured Ktor client with logging and JSON serialization
+- **NavigationService**: Clean, testable navigation pattern with injectable service
 
 ## Project Structure
 
@@ -83,6 +84,8 @@ Server runs on `http://localhost:8080`
 
 ## Architecture
 
+### Clean Architecture Layers
+
 Each feature follows Clean Architecture with three layers:
 
 - **Domain**: Business logic, models, repository interfaces
@@ -90,3 +93,86 @@ Each feature follows Clean Architecture with three layers:
 - **Presentation**: ViewModels (MVI pattern), Compose UI screens
 
 RPC communication uses shared interfaces in `sharedRpc/`, implemented on the server and consumed by clients via generated proxies.
+
+### Navigation Architecture
+
+This template uses a **NavigationService** pattern for clean, testable, and scalable navigation:
+
+#### NavigationService - Injectable Singleton
+
+```kotlin
+class NavigationService {
+    fun to(route: Route)                    // Navigate to route
+    fun back()                               // Navigate back
+    fun toAndClearUpTo(route, clearUpTo)    // Clear back stack
+    fun toAndClearAll(route)                 // Reset navigation
+}
+```
+
+#### ViewModel Usage
+
+ViewModels inject `NavigationService` and use simple API calls:
+
+```kotlin
+class HomeViewModel(
+    private val nav: NavigationService,  // Injected via Koin
+) : ViewModel() {
+    fun onAction(action: HomeAction) {
+        when (action) {
+            HomeAction.OnShowSettingsClicked -> {
+                // Add business logic (analytics, validation, etc.)
+                nav.to(Route.Settings)  // Simple!
+            }
+            HomeAction.OnBackClicked -> nav.back()
+        }
+    }
+}
+```
+
+#### Screen Simplicity
+
+Screens are ultra-clean with no navigation callbacks:
+
+```kotlin
+@Composable
+fun HomeScreenRoot(
+    viewModel: HomeViewModel = koinViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    HomeScreen(
+        state = state,
+        onAction = viewModel::onAction,
+    )
+}
+```
+
+#### App Setup
+
+Use `NavigationHost` wrapper that auto-observes NavigationService:
+
+```kotlin
+@Composable
+fun App() {
+    val navController = rememberNavController()
+
+    NavigationHost(
+        navController = navController,
+        startDestination = Route.Graph,
+    ) {
+        composable<Route.Home> { HomeScreenRoot() }
+        composable<Route.Settings> { SettingsScreenRoot() }
+    }
+}
+```
+
+#### Benefits
+
+- ✅ **Simple API**: `nav.to(route)` instead of manual effect management
+- ✅ **Testable**: Easy to mock NavigationService in unit tests
+- ✅ **Centralized**: Add analytics, guards, deep links in one place
+- ✅ **No Boilerplate**: No LaunchedEffect, callbacks, or when expressions
+- ✅ **True MVI**: Pure unidirectional data flow maintained
+
+#### Documentation
+
+For complete details, see [Navigation Service Architecture](docs/NAVIGATION_SERVICE_ARCHITECTURE.md)
