@@ -137,22 +137,22 @@ private fun LoadedSettingsList(
                 items(state.settingsForm.orEmpty()) { form ->
                     Column(modifier = Modifier.fillMaxWidth()) {
                         OutlinedTextField(
-                            value = form.value,
+                            value = form.valueField.value,
                             onValueChange = { newValue ->
                                 onAction(
                                     SettingsAction.LoadedSetting.OnValueChanged(
-                                        form.copy(value = newValue)
+                                        form.copy(valueField = form.valueField.copy(value = newValue))
                                     )
                                 )
                             },
                             label = { Text(form.key, style = formSize.labelTextStyle) },
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = formSize.inputTextStyle,
-                            isError = form.valueErrors.isNotEmpty(),
+                            isError = form.valueField.isInvalid,
                             supportingText = {
-                                if (form.valueErrors.isNotEmpty()) {
+                                if (form.valueField.isInvalid) {
                                     Column {
-                                        form.valueErrors.forEach { error ->
+                                        form.valueField.errors.forEach { error ->
                                             Text(
                                                 text = error.asString(),
                                                 color = MaterialTheme.colorScheme.error,
@@ -205,18 +205,18 @@ fun NewSetting(
 
             state.newSettingForm.let {
                 OutlinedTextField(
-                    value = it.key.orEmpty(),
+                    value = it.keyField.value.orEmpty(),
                     onValueChange = { newKey ->
                         onAction(SettingsAction.NewSetting.OnKeyChanged(newKey))
                     },
                     label = { Text("New Setting Key", style = formSize.labelTextStyle) },
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = formSize.inputTextStyle,
-                    isError = it.keyErrors.isNotEmpty(),
+                    isError = it.keyField.isInvalid,
                     supportingText = {
-                        if (it.keyErrors.isNotEmpty()) {
+                        if (it.keyField.isInvalid) {
                             Column {
-                                it.keyErrors.forEach { error ->
+                                it.keyField.errors.forEach { error ->
                                     Text(
                                         text = error.asString(),
                                         color = MaterialTheme.colorScheme.error,
@@ -229,18 +229,18 @@ fun NewSetting(
                 )
 
                 OutlinedTextField(
-                    value = it.value.orEmpty(),
+                    value = it.valueField.value.orEmpty(),
                     onValueChange = { newValue ->
                         onAction(SettingsAction.NewSetting.OnValueChanged(newValue))
                     },
                     label = { Text("New Setting Value", style = formSize.labelTextStyle) },
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = formSize.inputTextStyle,
-                    isError = it.valueErrors.isNotEmpty(),
+                    isError = it.valueField.isInvalid,
                     supportingText = {
-                        if (it.valueErrors.isNotEmpty()) {
+                        if (it.valueField.isInvalid) {
                             Column {
-                                it.valueErrors.forEach { error ->
+                                it.valueField.errors.forEach { error ->
                                     Text(
                                         text = error.asString(),
                                         color = MaterialTheme.colorScheme.error,

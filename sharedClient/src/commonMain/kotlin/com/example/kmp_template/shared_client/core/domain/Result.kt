@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.example.kmp_template.shared_client.core.domain
 
 sealed interface Result<out T, out E : Error> {

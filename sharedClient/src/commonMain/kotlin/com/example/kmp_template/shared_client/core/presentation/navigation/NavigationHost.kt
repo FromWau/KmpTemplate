@@ -1,4 +1,4 @@
-package com.example.kmp_template.shared_client.core.navigation
+package com.example.kmp_template.shared_client.core.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -7,11 +7,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
+import com.example.kmp_template.shared_client.app.Route
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 
 @Composable
-fun <T : Any> NavigationHost(
+fun <T : Route> NavigationHost(
     navController: NavHostController,
     startDestination: T,
     modifier: Modifier = Modifier,

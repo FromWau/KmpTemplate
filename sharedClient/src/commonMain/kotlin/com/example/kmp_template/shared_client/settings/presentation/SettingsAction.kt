@@ -1,5 +1,8 @@
 package com.example.kmp_template.shared_client.settings.presentation
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed interface SettingsAction {
     data object OnBackClicked : SettingsAction
 

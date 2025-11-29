@@ -13,8 +13,7 @@ import androidx.window.core.layout.WindowSizeClass
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = true, // Dynamic color is available on Android 12+
     content: @Composable () -> Unit,
 ) {
     ProvideDeviceType {

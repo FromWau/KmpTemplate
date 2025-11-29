@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.example.kmp_template.shared_client.core.navigation.NavigationHost
+import com.example.kmp_template.shared_client.core.presentation.navigation.NavigationHost
 import com.example.kmp_template.shared_client.core.presentation.toast.ToastHost
 import com.example.kmp_template.shared_client.home.presentation.HomeScreenRoot
 import com.example.kmp_template.shared_client.settings.presentation.composable.SettingsScreenRoot
@@ -27,7 +27,7 @@ fun App() {
         ) {
             Box(
                 modifier = Modifier.fillMaxSize().statusBarsPadding(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 val navController = rememberNavController()
 

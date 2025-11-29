@@ -1,12 +1,22 @@
+@file:Suppress("unused")
+
 package com.example.kmp_template.shared_client.core.presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
+@Immutable
 sealed interface StringValue {
     data class Raw(val value: String) : StringValue
-    data class Id(val id: StringResource, val args: List<Any> = emptyList()) : StringValue
+
+    data class Id(
+        val id: StringResource,
+        val args: ImmutableList<Any> = persistentListOf(),
+    ) : StringValue
 
     @Composable
     fun asString(): String {
@@ -16,3 +26,5 @@ sealed interface StringValue {
         }
     }
 }
+
+fun StringValue?.orEmpty(): StringValue = this ?: StringValue.Raw("")

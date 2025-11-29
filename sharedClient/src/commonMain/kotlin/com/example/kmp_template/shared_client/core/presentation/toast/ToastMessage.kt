@@ -1,8 +1,10 @@
 package com.example.kmp_template.shared_client.core.presentation.toast
 
+import androidx.compose.runtime.Immutable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+@Immutable
 data class ToastMessage(
     val message: String,
     val duration: Duration = 3.seconds,

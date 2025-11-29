@@ -2,7 +2,7 @@ package com.example.kmp_template.shared_client.di
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.example.kmp_template.core.database.DatabaseFactory
-import com.example.kmp_template.shared_client.core.navigation.NavigationService
+import com.example.kmp_template.shared_client.core.presentation.navigation.NavigationService
 import com.example.kmp_template.shared_client.core.presentation.toast.ToastService
 import com.example.kmp_template.shared_client.home.presentation.HomeViewModel
 import com.example.kmp_template.shared_client.settings.data.SettingsRepositoryImpl

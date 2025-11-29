@@ -3,13 +3,14 @@ package com.example.kmp_template.shared_client.settings.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmp_template.core.logger.Log
-import com.example.kmp_template.shared_client.core.navigation.NavigationService
 import com.example.kmp_template.shared_client.core.presentation.StringValue
+import com.example.kmp_template.shared_client.core.presentation.navigation.NavigationService
 import com.example.kmp_template.shared_client.core.presentation.toast.ToastService
 import com.example.kmp_template.shared_client.settings.domain.model.Settings
 import com.example.kmp_template.shared_client.settings.domain.repository.SettingsRepository
 import com.example.kmp_template.shared_client.settings.presentation.mapper.toSetting
 import com.example.kmp_template.shared_client.settings.presentation.mapper.toSettingsForm
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -104,21 +105,25 @@ class SettingsViewModel(
                 val updatedSettings = currentState.settingsForm
                     ?.map {
                         if (it.key == action.form.key) {
-                            it.copy(value = action.form.value)
+                            it.copy(valueField = action.form.valueField)
                         } else {
                             it
                         }
                     }
 
                 _state.update { old ->
-                    old.copy(settingsForm = updatedSettings)
+                    old.copy(settingsForm = updatedSettings?.toImmutableList())
                 }
             }
 
             is SettingsAction.NewSetting.OnKeyChanged -> {
                 val currentState = _state.value
 
-                val updatedNewForm = currentState.newSettingForm.copy(key = action.key)
+                val updatedNewForm = currentState.newSettingForm.copy(
+                    keyField = currentState.newSettingForm.keyField.copy(
+                        value = action.key,
+                    )
+                )
 
                 _state.update { old ->
                     old.copy(newSettingForm = updatedNewForm)
@@ -128,7 +133,11 @@ class SettingsViewModel(
             is SettingsAction.NewSetting.OnValueChanged -> {
                 val currentState = _state.value
 
-                val updatedNewForm = currentState.newSettingForm.copy(value = action.value)
+                val updatedNewForm = currentState.newSettingForm.copy(
+                    valueField = currentState.newSettingForm.valueField.copy(
+                        value = action.value,
+                    )
+                )
 
                 _state.update { old ->
                     old.copy(newSettingForm = updatedNewForm)
@@ -161,45 +170,43 @@ class SettingsViewModel(
 
                 val validatedNewForm = newSettingForm.let { form ->
                     val keyErrors = mutableListOf<StringValue>()
-                    if (newSettingForm.key?.isBlank() == true) { // null means untouched field
+                    if (newSettingForm.keyField.value?.isBlank() == true) { // null means untouched field
                         keyErrors.add(StringValue.Raw("Key cannot be empty"))
                     }
                     val keyAlreadyExists: Boolean = settingsForm.orEmpty().any {
-                        it.key == newSettingForm.key
+                        it.key == newSettingForm.keyField.value
                     }
                     if (keyAlreadyExists) {
                         keyErrors.add(StringValue.Raw("Key already exists"))
                     }
 
                     val valueErrors = mutableListOf<StringValue>()
-                    if (newSettingForm.value?.isBlank() == true) { // null means untouched field
+                    if (newSettingForm.valueField.value?.isBlank() == true) { // null means untouched field
                         valueErrors.add(StringValue.Raw("Value cannot be empty"))
                     }
 
                     form.copy(
-                        keyErrors = keyErrors,
-                        valueErrors = valueErrors,
+                        keyField = form.keyField.copy(errors = keyErrors.toImmutableList()),
+                        valueField = form.valueField.copy(errors = valueErrors.toImmutableList()),
                     )
                 }
 
                 val validatedLoadedForm = settingsForm?.map { form ->
                     val valueErrors = mutableListOf<StringValue>()
-                    if (form.value.isBlank()) {
+                    if (form.valueField.value.isBlank()) {
                         valueErrors.add(StringValue.Raw("Value cannot be empty"))
                     }
 
-                    form.copy(valueErrors = valueErrors)
+                    form.copy(valueField = form.valueField.copy(errors = valueErrors.toImmutableList()))
                 }
 
-                val isFormValid = validatedNewForm.keyErrors.isEmpty() &&
-                        validatedNewForm.valueErrors.isEmpty() &&
-                        validatedLoadedForm
-                            .orEmpty()
-                            .all { it.valueErrors.isEmpty() }
+                val isFormValid = validatedNewForm.keyField.isValid &&
+                        validatedNewForm.valueField.isValid &&
+                        validatedLoadedForm.orEmpty().all { it.valueField.isValid }
 
                 _state.update { old ->
                     old.copy(
-                        settingsForm = validatedLoadedForm,
+                        settingsForm = validatedLoadedForm?.toImmutableList(),
                         newSettingForm = validatedNewForm,
                         isFormValid = isFormValid,
                     )

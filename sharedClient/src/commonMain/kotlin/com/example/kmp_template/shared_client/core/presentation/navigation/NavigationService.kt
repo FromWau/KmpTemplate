@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package com.example.kmp_template.shared_client.core.navigation
+package com.example.kmp_template.shared_client.core.presentation.navigation
 
 import com.example.kmp_template.shared_client.app.Route
 import kotlinx.coroutines.channels.Channel

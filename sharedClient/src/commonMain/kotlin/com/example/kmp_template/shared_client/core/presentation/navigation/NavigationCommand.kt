@@ -1,7 +1,9 @@
-package com.example.kmp_template.shared_client.core.navigation
+package com.example.kmp_template.shared_client.core.presentation.navigation
 
+import androidx.compose.runtime.Immutable
 import com.example.kmp_template.shared_client.app.Route
 
+@Immutable
 sealed interface NavigationCommand {
     /**
      * Navigate back in the navigation stack

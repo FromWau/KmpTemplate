@@ -1,25 +1,27 @@
 package com.example.kmp_template.shared_client.settings.presentation
 
-import com.example.kmp_template.shared_client.core.presentation.StringValue
+import androidx.compose.runtime.Immutable
+import com.example.kmp_template.shared_client.core.presentation.FormField
+import kotlinx.collections.immutable.ImmutableList
 
+@Immutable
 data class SettingsState(
     // When null, it means loading
-    val settingsForm: List<SettingForm>? = null,
+    val settingsForm: ImmutableList<SettingForm>? = null,
 
     val newSettingForm: NewForm = NewForm(),
 
     val isFormValid: Boolean = true,
 ) {
+    @Immutable
     data class SettingForm(
         val key: String,
-        val value: String,
-        val valueErrors: List<StringValue> = emptyList(),
+        val valueField: FormField<String>,
     )
 
+    @Immutable
     data class NewForm(
-        val key: String? = null,
-        val keyErrors: List<StringValue> = emptyList(),
-        val value: String? = null,
-        val valueErrors: List<StringValue> = emptyList(),
+        val keyField: FormField<String?> = FormField(null),
+        val valueField: FormField<String?> = FormField(null),
     )
 }
