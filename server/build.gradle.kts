@@ -57,6 +57,6 @@ room {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-Xopt-in=kotlin.uuid.ExperimentalUuidApi")
+        freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
     }
 }
