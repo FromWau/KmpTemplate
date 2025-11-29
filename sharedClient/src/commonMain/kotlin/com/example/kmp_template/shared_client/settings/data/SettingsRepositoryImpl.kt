@@ -1,6 +1,7 @@
 package com.example.kmp_template.shared_client.settings.data
 
 import com.example.kmp_template.core.logger.Log
+import com.example.kmp_template.shared_client.core.presentation.toast.ToastService
 import com.example.kmp_template.shared_client.settings.data.database.SettingsDao
 import com.example.kmp_template.shared_client.settings.data.mapper.toSettings
 import com.example.kmp_template.shared_client.settings.data.mapper.toSettingsEntities
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.map
 
 class SettingsRepositoryImpl(
     private val settingsDao: SettingsDao,
+    private val toastService: ToastService,
 ) : SettingsRepository {
     companion object {
         const val TAG = "SettingsRepository"
@@ -23,6 +25,7 @@ class SettingsRepositoryImpl(
             return settingsDao.getAll().toSettings()
         } catch (e: Exception) {
             Log.tag(TAG).e(e) { "Failed to get settings" }
+            toastService.showError("Failed to load settings")
             return Settings(emptyList())
         }
     }
@@ -34,6 +37,7 @@ class SettingsRepositoryImpl(
             }
         } catch (e: Exception) {
             Log.tag(TAG).e(e) { "Failed to get settings flow" }
+            toastService.showError("Failed to load settings")
             return flowOf(Settings(emptyList()))
         }
     }
@@ -44,6 +48,7 @@ class SettingsRepositoryImpl(
             return true
         } catch (e: Exception) {
             Log.tag(TAG).e(e) { "Failed to upsert settings" }
+            toastService.showError("Failed to save settings")
             return false
         }
     }
@@ -53,6 +58,7 @@ class SettingsRepositoryImpl(
             return settingsDao.delete(setting.toSettingsEntity()) == 1
         } catch (e: Exception) {
             Log.tag(TAG).e(e) { "Failed to delete setting" }
+            toastService.showError("Failed to delete setting")
             return false
         }
     }

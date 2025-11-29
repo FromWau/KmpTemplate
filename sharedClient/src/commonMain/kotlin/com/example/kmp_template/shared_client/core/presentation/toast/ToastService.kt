@@ -12,8 +12,8 @@ class ToastService {
     )
     val toastEvents: SharedFlow<ToastMessage> = _toastEvents.asSharedFlow()
 
-    suspend fun showSuccess(message: String) {
-        _toastEvents.emit(
+    fun showSuccess(message: String) {
+        _toastEvents.tryEmit(
             ToastMessage(
                 message = message,
                 type = ToastType.SUCCESS,
@@ -21,8 +21,8 @@ class ToastService {
         )
     }
 
-    suspend fun showError(message: String) {
-        _toastEvents.emit(
+    fun showError(message: String) {
+        _toastEvents.tryEmit(
             ToastMessage(
                 message = message,
                 type = ToastType.ERROR,
@@ -30,8 +30,8 @@ class ToastService {
         )
     }
 
-    suspend fun showWarning(message: String) {
-        _toastEvents.emit(
+    fun showWarning(message: String) {
+        _toastEvents.tryEmit(
             ToastMessage(
                 message = message,
                 type = ToastType.WARNING,
@@ -39,8 +39,8 @@ class ToastService {
         )
     }
 
-    suspend fun showInfo(message: String) {
-        _toastEvents.emit(
+    fun showInfo(message: String) {
+        _toastEvents.tryEmit(
             ToastMessage(
                 message = message,
                 type = ToastType.INFO,
