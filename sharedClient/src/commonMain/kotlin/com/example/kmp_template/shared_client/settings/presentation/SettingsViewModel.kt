@@ -162,18 +162,18 @@ class SettingsViewModel(
                 val validatedNewForm = newSettingForm.let { form ->
                     val keyErrors = mutableListOf<StringValue>()
                     if (newSettingForm.key?.isBlank() == true) { // null means untouched field
-                        keyErrors.add(StringValue.HardCoded("Key cannot be empty"))
+                        keyErrors.add(StringValue.Raw("Key cannot be empty"))
                     }
                     val keyAlreadyExists: Boolean = settingsForm.orEmpty().any {
                         it.key == newSettingForm.key
                     }
                     if (keyAlreadyExists) {
-                        keyErrors.add(StringValue.HardCoded("Key already exists"))
+                        keyErrors.add(StringValue.Raw("Key already exists"))
                     }
 
                     val valueErrors = mutableListOf<StringValue>()
                     if (newSettingForm.value?.isBlank() == true) { // null means untouched field
-                        valueErrors.add(StringValue.HardCoded("Value cannot be empty"))
+                        valueErrors.add(StringValue.Raw("Value cannot be empty"))
                     }
 
                     form.copy(
@@ -185,7 +185,7 @@ class SettingsViewModel(
                 val validatedLoadedForm = settingsForm?.map { form ->
                     val valueErrors = mutableListOf<StringValue>()
                     if (form.value.isBlank()) {
-                        valueErrors.add(StringValue.HardCoded("Value cannot be empty"))
+                        valueErrors.add(StringValue.Raw("Value cannot be empty"))
                     }
 
                     form.copy(valueErrors = valueErrors)
