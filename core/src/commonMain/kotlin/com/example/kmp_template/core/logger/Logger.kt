@@ -103,12 +103,32 @@ abstract class Logger {
     private val bufferedLogs = mutableListOf<LogEntry>()
     private var fileSink: Sink? = null
 
+    fun reconfigure(config: LoggingConfig) {
+        lock.withLock {
+            val currentState = state
+            if (currentState !is LoggerState.Ready) {
+                Log.tag(TAG).w { "Logger not initialized yet, ignoring reconfigure" }
+                return@withLock
+            }
+
+            if (currentState.config == config) return@withLock
+
+            // Close existing file sink
+            try { fileSink?.close() } catch (_: Exception) {}
+            fileSink = null
+
+            // Update state with new config (keep systemAppDirectories)
+            state = LoggerState.Ready(config, currentState.systemAppDirectories)
+            Log.tag(TAG).i { "Logger reconfigured" }
+        }
+    }
+
     /**
      * Initialize the logger with config and flush buffered logs.
      * Should be called once after config is loaded.
      */
     fun initialize(config: LoggingConfig, systemDirs: SystemAppDirectories) {
-        Log.tag(TAG).d { "Initializing logger with config: $config" }
+        Log.tag(TAG).d { "Initializing logger" }
 
         lock.withLock {
             if (state is LoggerState.Ready) {

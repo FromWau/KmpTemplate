@@ -1,18 +1,19 @@
 package com.example.kmp_template.server.plugins
 
-import com.example.kmp_template.core.SystemAppDirectories
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.example.kmp_template.core.database.DatabaseFactory
 import com.example.kmp_template.core.di.coreModule
 import com.example.kmp_template.core.logger.Log
 import com.example.kmp_template.server.config.ServerConfig
-import com.example.kmp_template.server.feature.data.FeatureRepositoryImpl
-import com.example.kmp_template.server.feature.data.database.FeatureDatabase
-import com.example.kmp_template.server.feature.data.database.dao.ModelDao
-import com.example.kmp_template.server.feature.data.database.getFeatureDatabase
-import com.example.kmp_template.server.feature.domain.FeatureServiceImpl
-import com.example.kmp_template.server.feature.domain.repository.FeatureRepository
-import com.example.kmp_template.shared_rpc.feature.FeatureService
+import com.example.kmp_template.server.person.data.PersonRepositoryImpl
+import com.example.kmp_template.server.person.data.database.PersonDatabase
+import com.example.kmp_template.server.person.data.database.dao.PersonDao
+import com.example.kmp_template.server.person.domain.PeopleServiceImpl
+import com.example.kmp_template.server.person.domain.repository.PersonRepository
+import com.example.kmp_template.shared_rpc.person.PeopleService
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.logger.Level
 import org.koin.core.logger.MESSAGE
 import org.koin.core.module.dsl.singleOf
@@ -24,11 +25,21 @@ import org.koin.core.logger.Logger as KoinLogger
 fun serverModule(config: ServerConfig) = module {
     single<ServerConfig> { config }
 
-    single<FeatureDatabase> { getFeatureDatabase(get<SystemAppDirectories>().dataDir()) }
-    single<ModelDao> { get<FeatureDatabase>().modelDao() }
+    // Person
+    single<PersonDatabase> {
+        val dbFile = "${PersonDatabase.DB_NAME}.db"
+        get<DatabaseFactory>().create<PersonDatabase>(dbname = dbFile)
+            .fallbackToDestructiveMigrationOnDowngrade(true)
+            .fallbackToDestructiveMigration(true)
+            .setDriver(BundledSQLiteDriver())
+            .setQueryCoroutineContext(Dispatchers.IO)
+            .build()
+    }
+    single<PersonDao> { get<PersonDatabase>().personDao() }
+    singleOf(::PersonRepositoryImpl) bind PersonRepository::class
 
-    singleOf(::FeatureRepositoryImpl) bind FeatureRepository::class
-    singleOf(::FeatureServiceImpl) bind FeatureService::class
+    // Services
+    singleOf(::PeopleServiceImpl) bind PeopleService::class
 }
 
 fun Application.configureKoin(config: ServerConfig) {

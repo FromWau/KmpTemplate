@@ -10,23 +10,17 @@ import kotlinx.serialization.Transient
 data class AppConfig(
     @SerialName("logging")
     val logging: LoggingConfig = LoggingConfig(),
-    @SerialName("setting")
-    val settingConfig: SettingConfig = SettingConfig(),
     @SerialName("server")
     val server: ServerConnectionConfig = ServerConnectionConfig(),
 ) : Config {
     @Transient
     override val name: String = "app"
 
-    override val defaultContent: String
-        get() {
-            return """
-                |${logging.defaultContent}
-                |
-                |${settingConfig.defaultContent}
-                |
-                |${server.defaultContent}
-                |
+    override fun toToml(): String {
+        return """
+            |${logging.toToml()}
+            |
+            |${server.toToml()}
         """.trimMargin("|")
-        }
+    }
 }

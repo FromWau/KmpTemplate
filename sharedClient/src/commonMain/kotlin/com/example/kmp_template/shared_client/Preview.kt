@@ -12,10 +12,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.kmp_template.shared_client.core.FormField
 import com.example.kmp_template.shared_client.home.presentation.HomeContent
 import com.example.kmp_template.shared_client.home.presentation.HomeState
-import com.example.kmp_template.shared_client.setting.presentation.SettingState
-import com.example.kmp_template.shared_client.setting.presentation.composable.SettingContent
+import com.example.kmp_template.shared_client.person.presentation.PersonState
+import com.example.kmp_template.shared_client.person.presentation.composable.PersonContent
 import com.example.kmp_template.shared_client.theme.AppTheme
 import kotlinx.collections.immutable.persistentListOf
+import kotlin.uuid.Uuid
 
 @Composable
 private fun PreviewContainer(
@@ -44,11 +45,12 @@ private fun PreviewContainer(
 private fun Home_Preview() {
     PreviewContainer {
         val homeState = HomeState()
-        val settingState = SettingState(
-            settingForm = persistentListOf(
-                SettingState.SettingForm(
-                    key = "example_key",
-                    valueField = FormField("example_value"),
+        val personState = PersonState(
+            localPersonForm = persistentListOf(
+                PersonState.PersonForm(
+                    id = Uuid.random(),
+                    nameField = FormField("Example Name 1"),
+                    local = true,
                 )
             )
         )
@@ -56,9 +58,9 @@ private fun Home_Preview() {
         HomeContent(
             state = homeState,
             onAction = {},
-            settingContent = { modifier ->
-                SettingContent(
-                    state = settingState,
+            personContent = { modifier ->
+                PersonContent(
+                    state = personState,
                     onAction = {},
                     modifier = modifier,
                 )
@@ -69,11 +71,11 @@ private fun Home_Preview() {
 
 @Preview(device = "id:pixel_7_pro")
 @Composable
-private fun Setting_Preview() {
+private fun Person_Preview() {
     PreviewContainer {
-        val state = SettingState()
+        val state = PersonState()
 
-        SettingContent(
+        PersonContent(
             state = state,
             onAction = {},
         )

@@ -6,17 +6,15 @@ import com.example.kmp_template.core.database.DatabaseFactory
 import com.example.kmp_template.shared_client.app.AppStartupViewModel
 import com.example.kmp_template.shared_client.config.AppConfigProvider
 import com.example.kmp_template.shared_client.config.AppConfigProviderFactory
-import com.example.kmp_template.shared_client.core.feature.data.FeatureRepositoryImpl
-import com.example.kmp_template.shared_client.core.feature.data.rpc.FeatureRpcClient
-import com.example.kmp_template.shared_client.core.feature.domain.repository.FeatureRepository
 import com.example.kmp_template.shared_client.core.navigation.NavigationService
+import com.example.kmp_template.shared_client.person.data.PersonRepositoryImpl
+import com.example.kmp_template.shared_client.person.data.database.PersonDao
+import com.example.kmp_template.shared_client.person.data.database.PersonDatabase
+import com.example.kmp_template.shared_client.person.data.rpc.PersonRpcClient
+import com.example.kmp_template.shared_client.person.domain.repository.PersonRepository
 import com.example.kmp_template.shared_client.core.toast.ToastService
 import com.example.kmp_template.shared_client.home.presentation.HomeViewModel
-import com.example.kmp_template.shared_client.setting.data.SettingRepositoryImpl
-import com.example.kmp_template.shared_client.setting.data.database.SettingDao
-import com.example.kmp_template.shared_client.setting.data.database.SettingDatabase
-import com.example.kmp_template.shared_client.setting.domain.repository.SettingRepository
-import com.example.kmp_template.shared_client.setting.presentation.SettingViewModel
+import com.example.kmp_template.shared_client.person.presentation.PersonViewModel
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -37,28 +35,28 @@ val sharedModules = module {
         AppConfigProviderFactory.create(configManager = get(), systemDirs = get())
     }
 
-    // Setting
-    single<SettingDatabase> {
-        get<DatabaseFactory>().create<SettingDatabase>(dbname = SettingDatabase.DB_NAME)
+    // Person
+    single<PersonDatabase> {
+        val dbFile = "${PersonDatabase.DB_NAME}.db"
+        get<DatabaseFactory>().create<PersonDatabase>(dbname = dbFile)
             .fallbackToDestructiveMigrationOnDowngrade(true)
             .fallbackToDestructiveMigration(true)
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
             .build()
     }
-    single<SettingDao> { get<SettingDatabase>().settingDao }
-    singleOf(::SettingRepositoryImpl) bind SettingRepository::class
+    single<PersonDao> { get<PersonDatabase>().personDao }
 
     // Feature (RPC example)
-    singleOf(::FeatureRpcClient)
-    singleOf(::FeatureRepositoryImpl) bind FeatureRepository::class
+    singleOf(::PersonRpcClient)
+    singleOf(::PersonRepositoryImpl) bind PersonRepository::class
 }
 
 
 val viewModelModules = module {
     viewModelOf(::AppStartupViewModel)
     viewModelOf(::HomeViewModel)
-    viewModelOf(::SettingViewModel)
+    viewModelOf(::PersonViewModel)
 }
 
 

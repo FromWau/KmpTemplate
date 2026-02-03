@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kmp_template.shared_client.setting.presentation.composable.SettingScreen
+import com.example.kmp_template.shared_client.person.presentation.composable.PersonScreen
 import com.example.kmp_template.shared_client.theme.DeviceType
 import com.example.kmp_template.shared_client.theme.LocalDeviceType
 import org.koin.compose.viewmodel.koinViewModel
@@ -36,7 +36,7 @@ fun HomeContent(
     state: HomeState,
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier,
-    settingContent: @Composable (Modifier) -> Unit = { SettingScreen() },
+    personContent: @Composable (Modifier) -> Unit = { PersonScreen() },
 ) {
     val deviceType = LocalDeviceType.current
 
@@ -63,9 +63,9 @@ fun HomeContent(
                 DeviceType.TABLET_PORTRAIT,
                     -> {
                     Button(
-                        onClick = { onAction(HomeAction.OnSettingClicked) }
+                        onClick = { onAction(HomeAction.OnPersonClicked) }
                     ) {
-                        Text("Setting")
+                        Text("Person")
                     }
                 }
 
@@ -81,7 +81,7 @@ fun HomeContent(
                     Column(
                         modifier = Modifier.fillMaxHeight().weight(1f)
                     ) {
-                        settingContent(Modifier)
+                        personContent(Modifier)
                     }
             }
 

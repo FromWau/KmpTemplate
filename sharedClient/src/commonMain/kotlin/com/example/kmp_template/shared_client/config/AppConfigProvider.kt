@@ -30,6 +30,10 @@ class AppConfigProvider(
             configManager.save(new)
                 .onError { error -> Log.tag(TAG).e { "Failed to persist config: $error" } }
 
+            if (it.logging != new.logging) {
+                Log.reconfigure(new.logging)
+            }
+
             new
         }
     }
@@ -52,7 +56,7 @@ object AppConfigProviderFactory {
                     .w { "No config file found, creating default at: ${systemDirs.configDir()}/app.toml" }
                 val default = AppConfig()
 
-                configManager.saveDefaults(default)
+                configManager.save(default)
                 when (val reloaded = configManager.load(default)) {
                     is Result.Success -> reloaded.data
                     is Result.Error -> {

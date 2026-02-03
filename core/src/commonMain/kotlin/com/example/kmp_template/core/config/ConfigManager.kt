@@ -1,8 +1,6 @@
 package com.example.kmp_template.core.config
 
 import com.akuleshov7.ktoml.Toml
-import com.akuleshov7.ktoml.TomlIndentation
-import com.akuleshov7.ktoml.TomlOutputConfig
 import com.example.kmp_template.core.SystemAppDirectories
 import com.example.kmp_template.core.config.model.Config
 import com.example.kmp_template.core.logger.Log
@@ -27,14 +25,6 @@ class ConfigManager(
     }
 
     private val configDir = systemDirs.configDir()
-
-    // Custom TOML encoder with no indentation for clean output
-    private val tomlEncoder = Toml(
-        outputConfig = TomlOutputConfig(
-            indentation = TomlIndentation.NONE
-        )
-    )
-
 
     @OptIn(InternalSerializationApi::class)
     fun <T : Config> load(config: T): Result<T, ConfigError.LoadError> {
@@ -80,7 +70,6 @@ class ConfigManager(
         }
     }
 
-    @OptIn(InternalSerializationApi::class)
     fun save(config: Config): EmptyResult<ConfigError.SaveError> {
         try {
             SystemFileSystem.createDirectories(configDir, mustCreate = false)
@@ -93,9 +82,7 @@ class ConfigManager(
 
         val configFile = config.filePath
         try {
-            @Suppress("UNCHECKED_CAST")
-            val serializer = config::class.serializer() as kotlinx.serialization.KSerializer<Config>
-            val toml = tomlEncoder.encodeToString(serializer, config)
+            val toml = config.toToml()
             SystemFileSystem.sink(configFile).buffered().use {
                 it.writeString(toml)
             }
@@ -108,48 +95,8 @@ class ConfigManager(
                 ConfigError.SaveError.CanNotWriteToFile(configFile)
             )
 
-        } catch (e: SerializationException) {
-            Log.tag(TAG)
-                .e { "Failed to serialize config for saving to $configFile: ${e.message}" }
-            return Result.Error(
-                ConfigError.SaveError.ParseError(e.message ?: "Unknown serialization error")
-            )
-
         } catch (e: Exception) {
             Log.tag(TAG).e { "Unexpected error saving config to $configFile: ${e.message}" }
-            return Result.Error(
-                ConfigError.SaveError.GenericError(e)
-            )
-        }
-    }
-
-    fun saveDefaults(config: Config): EmptyResult<ConfigError.SaveError> {
-        try {
-            SystemFileSystem.createDirectories(configDir, mustCreate = false)
-        } catch (e: IOException) {
-            Log.tag(TAG).e { "Failed to create config directory at $configDir: ${e.message}" }
-            return Result.Error(
-                ConfigError.SaveError.CanNotCreateConfigDir(configDir)
-            )
-        }
-
-        val configFile = config.filePath
-        try {
-            val toml = config.defaultContent
-            SystemFileSystem.sink(configFile).buffered().use {
-                it.writeString(toml)
-            }
-            Log.tag(TAG).i { "Saved default config to: $configFile" }
-            return Result.Success(Unit)
-
-        } catch (e: IOException) {
-            Log.tag(TAG).e { "Failed to save default config to $configFile: ${e.message}" }
-            return Result.Error(
-                ConfigError.SaveError.CanNotWriteToFile(configFile)
-            )
-
-        } catch (e: Exception) {
-            Log.tag(TAG).e { "Unexpected error saving default config to $configFile: ${e.message}" }
             return Result.Error(
                 ConfigError.SaveError.GenericError(e)
             )
@@ -174,7 +121,6 @@ sealed interface ConfigError {
     sealed interface SaveError : ConfigError, Error {
         data class CanNotCreateConfigDir(val path: Path) : SaveError
         data class CanNotWriteToFile(val path: Path) : SaveError
-        data class ParseError(val message: String) : SaveError
         data class GenericError(val throwable: Throwable) : SaveError
     }
 }

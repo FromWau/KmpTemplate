@@ -13,19 +13,18 @@ data class ServerConfig(
     @Transient
     override val name: String = "server"
 
-    override val defaultContent: String
-        get() {
-            return """
-                |${logging.defaultContent}
-                |
-                |[server]
-                |developmentMode = ${server.developmentMode}
-                |host = "${server.host}"
-                |port = ${server.port}
-                |maxConnections = ${server.maxConnections}
-                |requestTimeoutSeconds = ${server.requestTimeoutSeconds}
-            """.trimMargin("|")
-        }
+    override fun toToml(): String {
+        return """
+            |${logging.toToml()}
+            |
+            |[server]
+            |developmentMode = ${server.developmentMode}
+            |host = "${server.host}"
+            |port = ${server.port}
+            |maxConnections = ${server.maxConnections}
+            |requestTimeoutSeconds = ${server.requestTimeoutSeconds}
+        """.trimMargin("|")
+    }
 }
 
 @Serializable

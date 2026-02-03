@@ -26,7 +26,7 @@ fun main() {
             Log.tag(TAG).w { "No config file found, creating default at: ${systemDirs.configDir()}/server.toml" }
             val default = ServerConfig()
 
-            configManager.saveDefaults(default)
+            configManager.save(default)
             when (val reloaded = configManager.load(default)) {
                 is Result.Success -> reloaded.data
                 is Result.Error -> {

@@ -1,7 +1,7 @@
 package com.example.kmp_template.server.plugins
 
 import com.example.kmp_template.core.logger.Log
-import com.example.kmp_template.server.feature.routing.featureRoutes
+import com.example.kmp_template.server.person.routing.personRoutes
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.response.respond
@@ -16,6 +16,6 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK, "OK")
         }
 
-        featureRoutes()
+        personRoutes()
     }
 }

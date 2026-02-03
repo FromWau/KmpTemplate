@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,11 +21,9 @@ import com.example.kmp_template.shared_client.core.navigation.NavigationHost
 import com.example.kmp_template.shared_client.core.permission.PermissionHost
 import com.example.kmp_template.shared_client.core.toast.presentation.ToastHost
 import com.example.kmp_template.shared_client.home.presentation.HomeScreen
-import com.example.kmp_template.shared_client.setting.presentation.composable.SettingScreen
+import com.example.kmp_template.shared_client.person.presentation.composable.PersonScreen
 import com.example.kmp_template.shared_client.theme.AppTheme
-import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun App(
@@ -36,20 +33,13 @@ fun App(
 
     App(
         state = state,
-        initApp = { viewModel.initializeApp() },
     )
 }
 
 @Composable
 private fun App(
     state: AppStartupState,
-    initApp: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        delay(1.seconds)
-        initApp()
-    }
-
     AppTheme(dynamicColor = false) {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -86,8 +76,8 @@ private fun AppReady() {
                 HomeScreen()
             }
 
-            composable<Route.Setting> {
-                SettingScreen()
+            composable<Route.Person> {
+                PersonScreen()
             }
         }
     }

@@ -12,12 +12,11 @@ data class ServerConnectionConfig(
     @Transient
     override val name: String = "server"
 
-    override val defaultContent: String
-        get() {
-            return """
-                |[${name}]
-                |host = "$host"
-                |port = $port
-            """.trimMargin("|")
-        }
+    override fun toToml(): String {
+        return """
+            |[$name]
+            |host = "$host"
+            |port = $port
+        """.trimMargin("|")
+    }
 }
