@@ -1,23 +1,23 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+    androidLibrary {
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        namespace = "com.example.kmp_template.core"
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
+        iosX64()
+        iosArm64()
+        iosSimulatorArm64()
+    }
 
     jvm()
 
@@ -34,6 +34,7 @@ kotlin {
             implementation(libs.bundles.ktor.client)
 
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.datetime)
 
             implementation(libs.room.runtime)
@@ -42,14 +43,20 @@ kotlin {
             api(libs.koin.core)
 
             implementation(libs.kotlinx.io.core)
+            implementation(libs.kotlinx.collections.immutable)
+
+            implementation(libs.ktoml.core)
+            implementation(libs.ktoml.file)
         }
 
         jvmMain.dependencies {
             implementation(libs.ktor.client.okhttp)
         }
 
-        nativeMain.dependencies {
-            implementation(libs.ktor.client.darwin)
+        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
+            nativeMain.dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
         }
 
         all {
@@ -62,20 +69,10 @@ kotlin {
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
+        add("kspIosSimulatorArm64", libs.room.compiler)
+        add("kspIosX64", libs.room.compiler)
+        add("kspIosArm64", libs.room.compiler)
+    }
     add("kspJvm", libs.room.compiler)
-}
-
-android {
-    namespace = "com.example.kmp_template.core"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
 }

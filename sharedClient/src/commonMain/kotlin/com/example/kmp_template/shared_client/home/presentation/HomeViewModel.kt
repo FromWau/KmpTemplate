@@ -2,7 +2,7 @@ package com.example.kmp_template.shared_client.home.presentation
 
 import androidx.lifecycle.ViewModel
 import com.example.kmp_template.shared_client.app.Route
-import com.example.kmp_template.shared_client.core.presentation.navigation.NavigationService
+import com.example.kmp_template.shared_client.core.navigation.NavigationService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,8 +15,8 @@ class HomeViewModel(
 
     fun onAction(action: HomeAction) {
         when (action) {
-            HomeAction.OnSettingsClicked -> {
-                nav.to(Route.Settings)
+            HomeAction.OnSettingClicked -> {
+                nav.to(Route.Setting)
             }
         }
     }

@@ -12,7 +12,7 @@ class FeatureServiceImpl(
     private val repo: FeatureRepository,
 ) : FeatureService {
     companion object {
-        const val TAG = "FeatureService"
+        private const val TAG = "FeatureService"
     }
 
     override fun getAllModelsFlow(): Flow<List<ModelRpc>> {

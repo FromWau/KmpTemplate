@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 rootProject.name = "KmpTemplate"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -32,8 +34,9 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":composeApp")
+include(":desktopApp")
+include(":androidApp")
 include(":core")
+include(":sharedRpc")
 include(":server")
 include(":sharedClient")
-include(":sharedRpc")

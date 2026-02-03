@@ -1,14 +1,21 @@
 package com.example.kmp_template.core.logger
 
+import com.example.kmp_template.core.config.model.LogFormat
+import com.example.kmp_template.core.config.model.LoggingConfig
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSLog
 
-actual val Log: Logger
-    get() = object : Logger {
-        override fun log(tag: String, logLevel: LogLevel, lazyMessage: () -> String) {
-            NSLog(toLogString(tag, logLevel, lazyMessage))
+@OptIn(ExperimentalForeignApi::class)
+actual val Log: Logger = object : Logger() {
+    override fun doLog(
+        logEntry: LogEntry,
+        config: LoggingConfig,
+    ) {
+        val output = when (config.format) {
+            LogFormat.JSON -> logEntry.toJsonString()
+            LogFormat.TEXT -> logEntry.toTextString()
         }
 
-        override fun log(tag: String, logLevel: LogLevel, throwable: Throwable) {
-            NSLog(toLogString(tag, logLevel, throwable))
-        }
+        NSLog(output)
     }
+}

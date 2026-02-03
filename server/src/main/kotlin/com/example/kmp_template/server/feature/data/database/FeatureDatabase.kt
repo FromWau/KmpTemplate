@@ -7,10 +7,10 @@ import androidx.room.TypeConverters
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.example.kmp_template.core.database.converter.LocaleDateTimeConverter
 import com.example.kmp_template.core.database.converter.UuidConverter
-import com.example.kmp_template.server.ServerSettings
 import com.example.kmp_template.server.feature.data.database.dao.ModelDao
 import com.example.kmp_template.server.feature.data.database.model.ModelEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.io.files.Path
 import java.io.File
 
 @Database(
@@ -30,16 +30,16 @@ abstract class FeatureDatabase : RoomDatabase() {
     }
 }
 
-private fun getFeatureDatabaseBuilder(): RoomDatabase.Builder<FeatureDatabase> {
+private fun getFeatureDatabaseBuilder(dataDir: Path): RoomDatabase.Builder<FeatureDatabase> {
     val dbFile = File(
-        ServerSettings().dataDir,
+        dataDir.toString(),
         "${FeatureDatabase.DB_NAME}.db"
     )
 
     return Room.databaseBuilder(dbFile.absolutePath)
 }
 
-fun getFeatureDatabase(): FeatureDatabase = getFeatureDatabaseBuilder()
+fun getFeatureDatabase(dataDir: Path): FeatureDatabase = getFeatureDatabaseBuilder(dataDir)
     .fallbackToDestructiveMigration(dropAllTables = true)
     .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
     .setDriver(BundledSQLiteDriver())

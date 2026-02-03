@@ -32,6 +32,7 @@ The script automatically handles all case conversions (PascalCase, camelCase, sn
 - **Dependency Injection**: Koin for DI across all platforms
 - **Modern UI**: Material 3 theming with dynamic colors
 - **Comprehensive Logging**: Platform-aware logging system
+- **TOML Configuration**: App configuration with XDG Base Directory conventions for config and data paths
 - **HTTP Client**: Pre-configured Ktor client with logging and JSON serialization
 - **NavigationService**: Clean, testable navigation pattern with injectable service
 
@@ -39,48 +40,42 @@ The script automatically handles all case conversions (PascalCase, camelCase, sn
 
 ```
 KmpTemplate/
-├── core/                  # Shared foundation (database, logging, networking)
+├── core/                  # Shared foundation (database, logging, networking, config)
 ├── sharedRpc/             # RPC contracts shared between client & server
 ├── sharedClient/          # Shared client business logic & UI
-├── composeApp/            # Platform-specific app entry points
+├── androidApp/            # Android app entry point
+├── desktopApp/            # Desktop (JVM) app entry point
 ├── server/                # Ktor server application
 └── iosApp/                # iOS SwiftUI wrapper
 ```
 
 ## Running the Applications
 
+Each module supports standard Gradle commands: `run`, `build`, `assemble`, etc.
+
 ### Android
 ```bash
-./gradlew :composeApp:installDebug
+./gradlew androidApp:run
 ```
 
 ### Desktop
 ```bash
-./gradlew :composeApp:run
+./gradlew desktopApp:run
+```
+
+Hot reload:
+```bash
+./gradlew desktopApp:hotRun --auto
 ```
 
 ### iOS
-Open `iosApp/iosApp.xcodeproj` in Xcode and run, or:
-```bash
-./gradlew :composeApp:iosSimulatorArm64Test
-```
+Open `iosApp/iosApp.xcodeproj` in Xcode and run.
 
 ### Server
 ```bash
-./gradlew :server:run
+./gradlew server:run
 ```
 Server runs on `http://localhost:8080`
-
-## Key Technologies
-
-- **Kotlin 2.2.0**
-- **Compose Multiplatform 1.8.2**
-- **Ktor 3.2.3** (client & server)
-- **Koin 4.1.0** (dependency injection)
-- **Room 2.7.2** (database)
-- **kotlinx-rpc 0.9.1** (RPC)
-- **kotlinx-coroutines 1.10.2**
-- **kotlinx-serialization 1.9.0**
 
 ## Architecture
 

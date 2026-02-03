@@ -1,26 +1,32 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+    androidLibrary {
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        namespace = "com.example.kmp_template.shared_client"
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
+        listOf(
+            iosX64(),
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach { iosTarget ->
+            iosTarget.binaries.framework {
+                baseName = "SharedClient"
+                isStatic = true
+            }
+        }
+    }
 
     jvm()
 
@@ -30,7 +36,7 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-            implementation(compose.preview)
+            implementation(libs.compose.ui.tooling)
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.koin.android)
@@ -42,12 +48,12 @@ kotlin {
             implementation(projects.core)
             implementation(projects.sharedRpc)
 
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.material3)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.material.icons.extended)
             implementation(libs.navigation.compose)
 
@@ -75,17 +81,17 @@ kotlin {
             implementation(libs.kotlinx.rpc.krpc.ktor.client)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.websockets)
-
         }
 
         jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
         }
 
-        nativeMain.dependencies {
-            implementation(libs.ktor.client.darwin)
+        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
+            nativeMain.dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
         }
 
         all {
@@ -93,26 +99,17 @@ kotlin {
                 optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
-    }
-}
 
-android {
-    namespace = "com.example.kmp_template.shared_client"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
+        add("kspIosSimulatorArm64", libs.room.compiler)
+        add("kspIosX64", libs.room.compiler)
+        add("kspIosArm64", libs.room.compiler)
+    }
     add("kspJvm", libs.room.compiler)
-    debugImplementation(compose.uiTooling)
 }

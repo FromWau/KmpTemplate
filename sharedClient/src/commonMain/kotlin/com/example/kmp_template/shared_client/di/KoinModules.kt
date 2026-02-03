@@ -1,17 +1,19 @@
 package com.example.kmp_template.shared_client.di
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.example.kmp_template.core.config.ConfigLoader
 import com.example.kmp_template.core.database.DatabaseFactory
-import com.example.kmp_template.shared_client.core.presentation.navigation.NavigationService
-import com.example.kmp_template.shared_client.core.presentation.toast.ToastService
+import com.example.kmp_template.shared_client.app.AppStartupViewModel
+import com.example.kmp_template.shared_client.core.navigation.NavigationService
+import com.example.kmp_template.shared_client.core.toast.ToastService
 import com.example.kmp_template.shared_client.home.presentation.HomeViewModel
-import com.example.kmp_template.shared_client.settings.data.SettingsRepositoryImpl
-import com.example.kmp_template.shared_client.settings.data.database.SettingsDao
-import com.example.kmp_template.shared_client.settings.data.database.SettingsDatabase
-import com.example.kmp_template.shared_client.settings.domain.repository.SettingsRepository
-import com.example.kmp_template.shared_client.settings.presentation.SettingsViewModel
+import com.example.kmp_template.shared_client.setting.data.SettingRepositoryImpl
+import com.example.kmp_template.shared_client.setting.data.database.SettingDao
+import com.example.kmp_template.shared_client.setting.data.database.SettingDatabase
+import com.example.kmp_template.shared_client.setting.domain.repository.SettingRepository
+import com.example.kmp_template.shared_client.setting.presentation.SettingViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -24,21 +26,28 @@ val sharedModules = module {
     // Toast
     singleOf(::ToastService)
 
-    // Settings
-    single<SettingsDatabase> {
-        get<DatabaseFactory>().create<SettingsDatabase>(dbname = SettingsDatabase.DB_NAME)
+    // Config Loader
+    singleOf(::ConfigLoader)
+
+    // Setting
+    single<SettingDatabase> {
+        get<DatabaseFactory>().create<SettingDatabase>(dbname = SettingDatabase.DB_NAME)
             .fallbackToDestructiveMigrationOnDowngrade(true)
             .fallbackToDestructiveMigration(true)
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
             .build()
     }
-    single<SettingsDao> { get<SettingsDatabase>().settingsDao }
-    singleOf(::SettingsRepositoryImpl) bind SettingsRepository::class
+    single<SettingDao> { get<SettingDatabase>().settingDao }
+    singleOf(::SettingRepositoryImpl) bind SettingRepository::class
 }
 
 
 val viewModelModules = module {
+    viewModelOf(::AppStartupViewModel)
     viewModelOf(::HomeViewModel)
-    viewModelOf(::SettingsViewModel)
+    viewModelOf(::SettingViewModel)
 }
+
+
+expect val sharedPlatformModules: Module

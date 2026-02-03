@@ -14,7 +14,6 @@ fun Application.configureSerialization() {
                 this.prettyPrint = true
                 this.ignoreUnknownKeys = true
                 this.allowStructuredMapKeys = true
-                this.isLenient = true
             },
             contentType = ContentType.Application.Json,
         )

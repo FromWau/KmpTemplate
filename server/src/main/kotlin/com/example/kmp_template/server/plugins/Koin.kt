@@ -1,7 +1,9 @@
 package com.example.kmp_template.server.plugins
 
+import com.example.kmp_template.core.SystemAppDirectories
 import com.example.kmp_template.core.di.coreModule
 import com.example.kmp_template.core.logger.Log
+import com.example.kmp_template.server.config.ServerConfig
 import com.example.kmp_template.server.feature.data.FeatureRepositoryImpl
 import com.example.kmp_template.server.feature.data.database.FeatureDatabase
 import com.example.kmp_template.server.feature.data.database.dao.ModelDao
@@ -17,29 +19,31 @@ import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.core.logger.Logger as KoinLogger
 
-val serverModule = module {
-    single<FeatureDatabase> { getFeatureDatabase() }
+fun serverModule(config: ServerConfig) = module {
+    single<ServerConfig> { config }
+
+    single<FeatureDatabase> { getFeatureDatabase(get<SystemAppDirectories>().dataDir()) }
     single<ModelDao> { get<FeatureDatabase>().modelDao() }
 
     singleOf(::FeatureRepositoryImpl) bind FeatureRepository::class
 }
 
-fun Application.configureKoin() {
+fun Application.configureKoin(config: ServerConfig) {
     install(Koin) {
         logger(KoinLoggerAdapter(Level.DEBUG))
-        modules(coreModule, serverModule)
+        modules(coreModule, serverModule(config))
     }
 }
 
 class KoinLoggerAdapter(level: Level = Level.INFO) : KoinLogger(level) {
-    val logger = Log.tag("Koin")
+    private val logger = Log.tag("Koin")
 
     override fun display(level: Level, msg: MESSAGE) {
         when (level) {
-            Level.DEBUG -> logger.d { msg }
-            Level.INFO -> logger.i { msg }
-            Level.ERROR -> logger.e { msg }
+            Level.DEBUG -> logger.v { msg }
+            Level.INFO -> logger.d { msg }
             Level.WARNING -> logger.w { msg }
+            Level.ERROR -> logger.e { msg }
             else -> logger.e { msg }
         }
     }

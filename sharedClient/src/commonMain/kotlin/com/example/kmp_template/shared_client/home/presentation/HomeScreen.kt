@@ -2,6 +2,8 @@ package com.example.kmp_template.shared_client.home.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -12,46 +14,78 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.kmp_template.shared_client.setting.presentation.composable.SettingScreen
+import com.example.kmp_template.shared_client.theme.DeviceType
 import com.example.kmp_template.shared_client.theme.LocalDeviceType
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun HomeScreenRoot(
+fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel<HomeViewModel>(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    HomeScreen(
+    HomeContent(
         state = state,
         onAction = viewModel::onAction,
     )
 }
 
 @Composable
-fun HomeScreen(
+fun HomeContent(
     state: HomeState,
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier,
+    settingContent: @Composable (Modifier) -> Unit = { SettingScreen() },
 ) {
     val deviceType = LocalDeviceType.current
 
-    Column(
+    Row(
         modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("Welcome to the Home Screen!")
-
-        Text(
-            text = "Device Type: $deviceType",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Button(
-            onClick = { onAction(HomeAction.OnSettingsClicked) }
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text("Settings")
+            Text("Welcome to the Home Screen!")
+
+            Text(
+                text = "Device Type: $deviceType",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            when (deviceType) {
+                DeviceType.MOBILE_PORTRAIT,
+                DeviceType.TABLET_PORTRAIT,
+                    -> {
+                    Button(
+                        onClick = { onAction(HomeAction.OnSettingClicked) }
+                    ) {
+                        Text("Setting")
+                    }
+                }
+
+                else -> {}
+            }
+        }
+
+        when (deviceType) {
+            DeviceType.MOBILE_LANDSCAPE,
+            DeviceType.TABLET_LANDSCAPE,
+            DeviceType.DESKTOP,
+                -> {
+                    Column(
+                        modifier = Modifier.fillMaxHeight().weight(1f)
+                    ) {
+                        settingContent(Modifier)
+                    }
+            }
+
+            else -> {}
         }
     }
 }

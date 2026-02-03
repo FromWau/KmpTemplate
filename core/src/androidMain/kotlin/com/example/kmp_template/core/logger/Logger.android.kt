@@ -1,26 +1,19 @@
 package com.example.kmp_template.core.logger
 
+import com.example.kmp_template.core.config.model.LoggingConfig
 import android.util.Log as AndroidLog
 
-actual val Log: Logger
-    get() = object : Logger {
-        override fun log(tag: String, logLevel: LogLevel, lazyMessage: () -> String) {
-            when (logLevel) {
-                LogLevel.VERBOSE -> AndroidLog.v(tag, lazyMessage())
-                LogLevel.DEBUG -> AndroidLog.d(tag, lazyMessage())
-                LogLevel.INFO -> AndroidLog.i(tag, lazyMessage())
-                LogLevel.WARN -> AndroidLog.w(tag, lazyMessage())
-                LogLevel.ERROR -> AndroidLog.e(tag, lazyMessage())
-            }
-        }
-
-        override fun log(tag: String, logLevel: LogLevel, throwable: Throwable) {
-            when (logLevel) {
-                LogLevel.VERBOSE -> AndroidLog.v(tag, throwable.message, throwable)
-                LogLevel.DEBUG -> AndroidLog.d(tag, throwable.message, throwable)
-                LogLevel.INFO -> AndroidLog.i(tag, throwable.message, throwable)
-                LogLevel.WARN -> AndroidLog.w(tag, throwable.message, throwable)
-                LogLevel.ERROR -> AndroidLog.e(tag, throwable.message, throwable)
-            }
+actual val Log: Logger = object : Logger() {
+    override fun doLog(
+        logEntry: LogEntry,
+        config: LoggingConfig,
+    ) {
+        when (logEntry.logLevel) {
+            LogLevel.VERBOSE -> AndroidLog.v(logEntry.tag, logEntry.message)
+            LogLevel.DEBUG -> AndroidLog.d(logEntry.tag, logEntry.message)
+            LogLevel.INFO -> AndroidLog.i(logEntry.tag, logEntry.message)
+            LogLevel.WARN -> AndroidLog.w(logEntry.tag, logEntry.message)
+            LogLevel.ERROR -> AndroidLog.e(logEntry.tag, logEntry.message)
         }
     }
+}

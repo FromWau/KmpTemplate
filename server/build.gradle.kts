@@ -11,9 +11,7 @@ plugins {
 group = "com.example.kmp_template"
 version = "1.0.0"
 application {
-    mainClass.set("io.ktor.server.netty.EngineMain")
-    applicationDefaultJvmArgs =
-        listOf("-Dio.ktor.development=${extra["io.ktor.development"] ?: "false"}")
+    mainClass.set("com.example.kmp_template.server.ApplicationKt")
 }
 
 dependencies {
@@ -22,8 +20,6 @@ dependencies {
 
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.ktor.client)
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.cors.jvm)
     implementation(libs.ktor.server.host.common.jvm)
 
@@ -39,8 +35,6 @@ dependencies {
     implementation(libs.koin.core)
 
     implementation(libs.koin.ktor)
-
-    implementation(libs.typesafeConfig)
 
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)

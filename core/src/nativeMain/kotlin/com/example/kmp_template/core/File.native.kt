@@ -21,6 +21,21 @@ actual class SystemAppDirectories {
         return Path(requireNotNull(documentDirectory?.path))
     }
 
-    actual fun databaseFile(dbname: String): Path =
-        Path(dataDir(), "databases", dbname)
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun configDir(): Path {
+        val applicationSupportDirectory = NSFileManager.defaultManager.URLForDirectory(
+            directory = platform.Foundation.NSApplicationSupportDirectory,
+            inDomain = NSUserDomainMask,
+            appropriateForURL = null,
+            create = true,
+            error = null,
+        )
+
+        return Path(requireNotNull(applicationSupportDirectory?.path), "config")
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun homeDir(): Path = Path(platform.Foundation.NSHomeDirectory())
+
+    actual fun mediaDir(): Path = Path(dataDir(), "media")
 }

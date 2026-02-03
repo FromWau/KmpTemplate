@@ -1,33 +1,34 @@
 [versions]
-agp = "8.13.1"
+agp = "9.0.0"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activityCompose = "1.12.0"
+androidx-activityCompose = "1.12.3"
 androidx-appcompat = "1.7.1"
 androidx-core-ktx = "1.17.0"
 androidx-lifecycle = "2.9.6"
-composeHotReload = "1.0.0"
-compose-multiplatform = "1.9.3"
-kotlin = "2.2.21"
+compose-multiplatform = "1.10.0"
+kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
-kotlin-serialization = "1.9.0"
+kotlin-serialization = "1.10.0"
+kotlinxAtomicfu = "0.31.0"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxIoCore = "0.8.2"
+material3 = "1.9.0"
 materialIconsExtended = "1.7.3"
 androidx-window = "1.5.1"
 material3-adaptive = "1.2.0"
 navigationCompose = "2.9.1"
-ktor = "3.3.3"
+ktor = "3.4.0"
 koin = "4.1.1"
 coil = "3.3.0"
 dateTime = "0.7.1"
 room = "2.8.4"
 slf4jNop = "2.0.17"
 sqlite = "2.6.2"
-ksp = "2.2.21-2.0.4"
-typesafeConfig = "1.4.5"
-kotlinx-rpc = "0.10.1"
+ksp = "2.3.2"
+ktoml = "0.7.1"
+kotlinx-rpc = "0.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -42,6 +43,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "dateTime" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinxAtomicfu" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 
 # kotlinx-rpc
@@ -81,6 +83,14 @@ coil-compose-core = { module = "io.coil-kt.coil3:coil-compose-core", version.ref
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-multiplatform" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
+material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-window-core = { module = "androidx.window:window-core", version.ref = "androidx-window" }
 material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "material3-adaptive" }
@@ -91,12 +101,12 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4jNop" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
-typesafeConfig = { module = "com.typesafe:config", version.ref = "typesafeConfig" }
+ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
+ktoml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
