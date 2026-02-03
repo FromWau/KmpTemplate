@@ -1,6 +1,7 @@
 package com.example.kmp_template.server.feature.domain
 
 import com.example.kmp_template.core.logger.Log
+import com.example.kmp_template.server.feature.domain.mapper.toDomain
 import com.example.kmp_template.server.feature.domain.mapper.toRpc
 import com.example.kmp_template.server.feature.domain.repository.FeatureRepository
 import com.example.kmp_template.shared_rpc.feature.FeatureService
@@ -25,5 +26,10 @@ class FeatureServiceImpl(
     override suspend fun getModelByName(name: String): ModelRpc? {
         Log.tag(TAG).d { "getModelByName called with name: $name" }
         return repo.getModelByName(name)?.toRpc()
+    }
+
+    override suspend fun saveModel(model: ModelRpc): Boolean {
+        Log.tag(TAG).d { "saveModel called with model: $model" }
+        return repo.saveModel(model.toDomain())
     }
 }

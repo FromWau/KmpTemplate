@@ -9,6 +9,8 @@ import com.example.kmp_template.shared_client.setting.data.mapper.toSettingEntit
 import com.example.kmp_template.shared_client.setting.data.mapper.toSettingEntity
 import com.example.kmp_template.shared_client.setting.domain.model.Setting
 import com.example.kmp_template.shared_client.setting.domain.repository.SettingRepository
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -25,6 +27,7 @@ class SettingRepositoryImpl(
         try {
             return settingDao.getAll().toSetting()
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Log.tag(TAG).e(e) { "Failed to get settings" }
             toastService.showError(StringValue.Raw("Failed to load settings"))
             return Setting(emptyList())
@@ -48,6 +51,7 @@ class SettingRepositoryImpl(
             settingDao.upsert(*setting.toSettingEntities().toTypedArray())
             return true
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Log.tag(TAG).e(e) { "Failed to upsert setting" }
             toastService.showError(StringValue.Raw("Failed to save setting"))
             return false
@@ -58,6 +62,7 @@ class SettingRepositoryImpl(
         try {
             return settingDao.delete(setting.toSettingEntity()) == 1
         } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
             Log.tag(TAG).e(e) { "Failed to delete setting" }
             toastService.showError(StringValue.Raw("Failed to delete setting"))
             return false

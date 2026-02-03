@@ -8,4 +8,6 @@ import kotlinx.rpc.annotations.Rpc
 interface FeatureService {
     fun getAllModelsFlow(): Flow<List<ModelRpc>>
     suspend fun getModelByName(name: String): ModelRpc?
+
+    suspend fun saveModel(model: ModelRpc): Boolean
 }

@@ -9,6 +9,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.rpc.krpc.ktor.client.installKrpc
 import kotlinx.serialization.json.Json
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
@@ -30,6 +31,8 @@ object HttpClientFactory {
                 }
             }
         }
+
+        installKrpc()
 
         install(HttpTimeout) {
             requestTimeoutMillis = 15_000

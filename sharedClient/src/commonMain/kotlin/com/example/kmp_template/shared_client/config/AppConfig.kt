@@ -12,6 +12,8 @@ data class AppConfig(
     val logging: LoggingConfig = LoggingConfig(),
     @SerialName("setting")
     val settingConfig: SettingConfig = SettingConfig(),
+    @SerialName("server")
+    val server: ServerConnectionConfig = ServerConnectionConfig(),
 ) : Config {
     @Transient
     override val name: String = "app"
@@ -22,6 +24,8 @@ data class AppConfig(
                 |${logging.defaultContent}
                 |
                 |${settingConfig.defaultContent}
+                |
+                |${server.defaultContent}
                 |
         """.trimMargin("|")
         }

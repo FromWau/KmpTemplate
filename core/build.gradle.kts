@@ -32,6 +32,8 @@ kotlin {
 
         commonMain.dependencies {
             implementation(libs.bundles.ktor.client)
+            implementation(libs.kotlinx.rpc.krpc.ktor.client)
+
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.atomicfu)

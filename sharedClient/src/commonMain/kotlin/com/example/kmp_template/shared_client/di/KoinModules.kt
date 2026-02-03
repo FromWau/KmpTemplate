@@ -1,9 +1,14 @@
 package com.example.kmp_template.shared_client.di
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.example.kmp_template.core.config.ConfigLoader
+import com.example.kmp_template.core.config.ConfigManager
 import com.example.kmp_template.core.database.DatabaseFactory
 import com.example.kmp_template.shared_client.app.AppStartupViewModel
+import com.example.kmp_template.shared_client.config.AppConfigProvider
+import com.example.kmp_template.shared_client.config.AppConfigProviderFactory
+import com.example.kmp_template.shared_client.core.feature.data.FeatureRepositoryImpl
+import com.example.kmp_template.shared_client.core.feature.data.rpc.FeatureRpcClient
+import com.example.kmp_template.shared_client.core.feature.domain.repository.FeatureRepository
 import com.example.kmp_template.shared_client.core.navigation.NavigationService
 import com.example.kmp_template.shared_client.core.toast.ToastService
 import com.example.kmp_template.shared_client.home.presentation.HomeViewModel
@@ -26,8 +31,11 @@ val sharedModules = module {
     // Toast
     singleOf(::ToastService)
 
-    // Config Loader
-    singleOf(::ConfigLoader)
+    // Config
+    singleOf(::ConfigManager)
+    single<AppConfigProvider>(createdAtStart = true) {
+        AppConfigProviderFactory.create(configManager = get(), systemDirs = get())
+    }
 
     // Setting
     single<SettingDatabase> {
@@ -40,6 +48,10 @@ val sharedModules = module {
     }
     single<SettingDao> { get<SettingDatabase>().settingDao }
     singleOf(::SettingRepositoryImpl) bind SettingRepository::class
+
+    // Feature (RPC example)
+    singleOf(::FeatureRpcClient)
+    singleOf(::FeatureRepositoryImpl) bind FeatureRepository::class
 }
 
 

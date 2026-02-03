@@ -10,18 +10,6 @@ After creating a new repository from this template, rename the project to your d
 ./rename-project.sh
 ```
 
-The script will prompt you for:
-- **Project name** (e.g., `MyAwesomeApp`) - used for class names and identifiers
-- **App display name** (e.g., `My Awesome App`) - shown to users
-- **Package domain** (e.g., `com.example`) - your package namespace
-
-The script automatically handles all case conversions (PascalCase, camelCase, snake_case, kebab-case) and renames:
-- All source files and directories
-- Package names and namespaces
-- Build configurations
-- iOS project settings
-- Class and file names
-
 ## Features
 
 - **Multi-platform Support**: Android, iOS, Desktop (JVM), and Server

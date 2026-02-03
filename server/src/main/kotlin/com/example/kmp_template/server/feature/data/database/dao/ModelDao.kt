@@ -11,11 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ModelDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(model: ModelEntity)
-
-    @Update
-    suspend fun update(model: ModelEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(model: ModelEntity): Long
 
     @Delete
     suspend fun delete(model: ModelEntity)
@@ -28,4 +25,7 @@ interface ModelDao {
 
     @Query("SELECT * FROM models WHERE name = :name")
     suspend fun findByName(name: String): ModelEntity?
+
+    @Query("DELETE FROM models")
+    suspend fun deleteAll()
 }

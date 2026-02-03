@@ -2,6 +2,7 @@ package com.example.kmp_template.server.feature.data
 
 import com.example.kmp_template.server.feature.data.database.dao.ModelDao
 import com.example.kmp_template.server.feature.data.database.mapper.toDomain
+import com.example.kmp_template.server.feature.data.database.mapper.toEntity
 import com.example.kmp_template.server.feature.domain.model.Model
 import com.example.kmp_template.server.feature.domain.repository.FeatureRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,5 +19,10 @@ class FeatureRepositoryImpl(
 
     override suspend fun getModelByName(name: String): Model? {
         return modelDao.findByName(name)?.toDomain()
+    }
+
+    override suspend fun saveModel(model: Model): Boolean {
+        modelDao.upsert(model.toEntity())
+        return true
     }
 }

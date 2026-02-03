@@ -8,7 +8,9 @@ import com.example.kmp_template.server.feature.data.FeatureRepositoryImpl
 import com.example.kmp_template.server.feature.data.database.FeatureDatabase
 import com.example.kmp_template.server.feature.data.database.dao.ModelDao
 import com.example.kmp_template.server.feature.data.database.getFeatureDatabase
+import com.example.kmp_template.server.feature.domain.FeatureServiceImpl
 import com.example.kmp_template.server.feature.domain.repository.FeatureRepository
+import com.example.kmp_template.shared_rpc.feature.FeatureService
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.koin.core.logger.Level
@@ -26,6 +28,7 @@ fun serverModule(config: ServerConfig) = module {
     single<ModelDao> { get<FeatureDatabase>().modelDao() }
 
     singleOf(::FeatureRepositoryImpl) bind FeatureRepository::class
+    singleOf(::FeatureServiceImpl) bind FeatureService::class
 }
 
 fun Application.configureKoin(config: ServerConfig) {

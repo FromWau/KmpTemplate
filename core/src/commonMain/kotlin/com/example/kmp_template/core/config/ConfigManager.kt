@@ -19,11 +19,11 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.serializer
 
-class ConfigLoader(
+class ConfigManager(
     systemDirs: SystemAppDirectories,
 ) {
     companion object {
-        private const val TAG = "ConfigLoader"
+        private const val TAG = "ConfigManager"
     }
 
     private val configDir = systemDirs.configDir()
