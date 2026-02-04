@@ -77,6 +77,83 @@ Each feature follows Clean Architecture with three layers:
 
 RPC communication uses shared interfaces in `sharedRpc/`, implemented on the server and consumed by clients via generated proxies.
 
+### Compose Screen Pattern
+
+Each screen follows a strict two-layer pattern separating state management from UI:
+
+#### `<Thing>Screen()` — Root Entry Point
+
+Handles ViewModel injection and state collection. Contains no UI logic.
+
+```kotlin
+@Composable
+fun PersonScreen(
+    viewModel: PersonViewModel = koinViewModel<PersonViewModel>(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    PersonContent(
+        state = state,
+        onAction = viewModel::onAction,
+    )
+}
+```
+
+#### `<Thing>Content()` — Pure UI Composable
+
+Stateless composable that receives everything it needs as parameters. Testable and previewable.
+
+```kotlin
+@Composable
+fun PersonContent(
+    state: PersonState,
+    onAction: (PersonAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // UI implementation
+}
+```
+
+Content composables can accept optional embedded content for composition:
+
+```kotlin
+@Composable
+fun HomeContent(
+    state: HomeState,
+    onAction: (HomeAction) -> Unit,
+    modifier: Modifier = Modifier,
+    personContent: @Composable (Modifier) -> Unit = { PersonScreen() },
+) { ... }
+```
+
+#### State, Action, ViewModel
+
+- **State**: `@Immutable` data class with defaults. Uses `ImmutableList` from kotlinx.collections.immutable instead of `List`. Uses `FormField<T>` for form validation.
+- **Action**: `@Immutable` sealed interface. Uses `data object` for simple actions, `data class` for parameterized ones. Can nest sub-sealed interfaces for grouping (e.g., `PersonAction.NewPerson`, `PersonAction.LoadedPerson`).
+- **ViewModel**: Exposes `StateFlow<State>` and a single `onAction(Action)` function. Uses `viewModelScope` for coroutines. Navigation via injected `NavigationService`.
+
+#### Files per Feature
+
+```
+person/
+├── domain/
+│   ├── model/Person.kt
+│   └── repository/PersonRepository.kt
+├── data/
+│   ├── PersonRepositoryImpl.kt
+│   ├── database/PersonDao.kt, PersonEntity.kt, PersonDatabase.kt
+│   ├── rpc/PersonRpcClient.kt
+│   └── mapper/PersonMapper.kt
+└── presentation/
+    ├── PersonScreen.kt          # Screen() + Content()
+    ├── PersonState.kt           # @Immutable data class
+    ├── PersonAction.kt          # @Immutable sealed interface
+    ├── PersonViewModel.kt       # ViewModel with StateFlow + onAction
+    └── mapper/PersonMapper.kt   # Domain ↔ Form mappers
+```
+
+Previews live in a shared `Preview.kt` file using `<Thing>Content()` with mock state.
+
 ### Navigation Architecture
 
 This template uses a **NavigationService** pattern for clean, testable, and scalable navigation:
@@ -102,30 +179,9 @@ class HomeViewModel(
 ) : ViewModel() {
     fun onAction(action: HomeAction) {
         when (action) {
-            HomeAction.OnShowSettingsClicked -> {
-                // Add business logic (analytics, validation, etc.)
-                nav.to(Route.Settings)  // Simple!
-            }
-            HomeAction.OnBackClicked -> nav.back()
+            HomeAction.OnPersonClicked -> nav.to(Route.Person)
         }
     }
-}
-```
-
-#### Screen Simplicity
-
-Screens are ultra-clean with no navigation callbacks:
-
-```kotlin
-@Composable
-fun HomeScreenRoot(
-    viewModel: HomeViewModel = koinViewModel(),
-) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    HomeScreen(
-        state = state,
-        onAction = viewModel::onAction,
-    )
 }
 ```
 
@@ -135,27 +191,74 @@ Use `NavigationHost` wrapper that auto-observes NavigationService:
 
 ```kotlin
 @Composable
-fun App() {
-    val navController = rememberNavController()
-
+fun AppReady() {
     NavigationHost(
-        navController = navController,
+        navController = rememberNavController(),
         startDestination = Route.Graph,
     ) {
-        composable<Route.Home> { HomeScreenRoot() }
-        composable<Route.Settings> { SettingsScreenRoot() }
+        navigation<Route.Graph>(startDestination = Route.Home) {
+            composable<Route.Home> { HomeScreen() }
+            composable<Route.Person> { PersonScreen() }
+        }
     }
 }
 ```
 
 #### Benefits
 
-- ✅ **Simple API**: `nav.to(route)` instead of manual effect management
-- ✅ **Testable**: Easy to mock NavigationService in unit tests
-- ✅ **Centralized**: Add analytics, guards, deep links in one place
-- ✅ **No Boilerplate**: No LaunchedEffect, callbacks, or when expressions
-- ✅ **True MVI**: Pure unidirectional data flow maintained
+- **Simple API**: `nav.to(route)` instead of manual effect management
+- **Testable**: Easy to mock NavigationService in unit tests
+- **Centralized**: Add analytics, guards, deep links in one place
+- **No Boilerplate**: No LaunchedEffect, callbacks, or when expressions
+- **True MVI**: Pure unidirectional data flow maintained
 
-#### Documentation
+### Configuration
 
-For complete details, see [Navigation Service Architecture](docs/NAVIGATION_SERVICE_ARCHITECTURE.md)
+App configuration uses TOML files following XDG Base Directory conventions (e.g., `~/.config/kmp_template/app.toml`). Each `Config` implements `toToml()` to produce commented output, so programmatic saves preserve inline documentation.
+
+#### AppConfigProvider — Runtime Config
+
+`AppConfigProvider` holds the current config as a `StateFlow<AppConfig>`, loaded eagerly at startup via `AppConfigProviderFactory` with Koin's `createdAtStart = true`. Config changes are applied via `updateConfig()`, which persists to disk and triggers downstream service reactions:
+
+- **Logger**: `Log.reconfigure()` applies new log level, format, and file settings immediately
+- **RPC Client**: `PersonRpcClient` uses a check-on-use pattern — compares `ServerConnectionConfig` before each call and reconnects if host/port changed
+
+```kotlin
+// Example: changing log level at runtime
+appConfigProvider.updateConfig { config ->
+    config.copy(logging = config.logging.copy(level = LogLevel.ERROR))
+}
+// Logger is reconfigured, config is persisted to app.toml
+```
+
+#### Check-on-Use Pattern
+
+Services that depend on config use a check-on-use pattern: cache the connection and the config snapshot, compare before each call, and recreate if changed. This avoids flow observation and keeps the logic colocated.
+
+```kotlin
+class PersonRpcClient(
+    private val ktorClient: HttpClient,
+    private val appConfigProvider: AppConfigProvider,
+) {
+    private val mutex = Mutex()
+    private var currentServerConfig: ServerConnectionConfig? = null
+    private var rpcClientScope: CoroutineScope? = null
+    private var rpcClient: RpcClient? = null
+    private var peopleService: PeopleService? = null
+
+    private suspend fun service(): PeopleService = mutex.withLock {
+        val serverConfig = appConfigProvider.config.value.server
+        if (serverConfig != currentServerConfig) {
+            rpcClientScope?.cancel()  // closes old connection
+            rpcClientScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+            rpcClient = ktorClient.rpc { /* new connection config */ }
+            peopleService = rpcClient!!.withService()
+            currentServerConfig = serverConfig
+        }
+        peopleService!!
+    }
+
+    suspend fun getAllPeople(): List<PersonRpc> = service().getAllPeople()
+}
+```
